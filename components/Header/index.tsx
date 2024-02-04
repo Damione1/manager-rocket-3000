@@ -60,15 +60,15 @@ const Header = (props: {
             <Image
               width={32}
               height={32}
-              src={"/images/logo/logo-icon.svg"}
+              //center the image
+              className="mx-auto"
+              src={"/manager-rocket.svg"}
               alt="Logo"
             />
           </Link>
         </div>
 
-        <div className="hidden sm:block">
-
-        </div>
+        <div className="hidden sm:block"></div>
 
         <div className="flex items-center gap-3 2xsm:gap-7">
           <ul className="flex items-center gap-2 2xsm:gap-4">
@@ -77,7 +77,7 @@ const Header = (props: {
             {/* <!-- Dark Mode Toggler --> */}
 
             {/* <!-- Notification Menu Area --> */}
-            <DropdownNotification />
+            {/* <DropdownNotification /> */}
             {/* <!-- Notification Menu Area --> */}
           </ul>
 

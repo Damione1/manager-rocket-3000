@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useSession } from "next-auth/react"
+import { useSession, signOut  } from "next-auth/react"
 import { authOptions } from "./../../app/api/auth/[...nextauth]/options";
 
 export default function DropdownUser(){
@@ -50,6 +50,9 @@ export default function DropdownUser(){
           <span className="block text-sm font-medium text-black dark:text-white">
             {session?.user?.name}
           </span>
+          <span className="block text-xs font-medium">
+            {session?.user?.shopName}
+          </span>
           <span className="block text-xs"></span>
         </span>
 
@@ -57,7 +60,7 @@ export default function DropdownUser(){
           <Image
             width={112}
             height={112}
-            src={"/images/user/user-01.png"}
+            src={session?.user?.image as string}
             alt="User"
           />
         </span>
@@ -87,8 +90,7 @@ export default function DropdownUser(){
         className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark ${dropdownOpen === true ? "block" : "hidden"
           }`}
       >
-
-        <Link href="/api/auth/signout" className="flex items-center gap-3.5 py-4 px-6 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
+        <button onClick={() => signOut()} className="flex items-center gap-3.5 py-4 px-6 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
           <svg
             className="fill-current"
             width="22"
@@ -107,7 +109,7 @@ export default function DropdownUser(){
             />
           </svg>
           Log Out
-        </Link>
+        </button>
       </div>
       {/* <!-- Dropdown End --> */}
     </div>
