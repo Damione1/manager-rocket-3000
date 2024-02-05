@@ -12,8 +12,8 @@ const SignIn: React.FC = () => {
       <div className="xl-w-1/2 rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-wrap items-center">
           <div className="border-stroke dark:border-strokedark xl:border-l-2">
-            <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
-              <div className=" py-17.5 px-26 text-center">
+            <div className="w-full p-4 pt-0 sm:p-12.5 xl:p-17.5">
+              <div className=" py-1.5 px-36 text-center">
                 <Link className="mb-5.5 inline-block" href="/">
                   <svg
                     width="350"
@@ -897,9 +897,12 @@ const SignIn: React.FC = () => {
                   </svg>
                 </Link>
               </div>
-              <h2 className="text-center mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
+              <h2 className="text-center mb-2 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
                 Manager Rocket 3000
               </h2>
+              <p className="font-medium p-5 mb-2 text-center">
+                Unlock your Lightspeed store&apos;s full potential.
+              </p>
 
               <button
                 onClick={() => signIn("lightspeed", { callbackUrl: "/" })}
