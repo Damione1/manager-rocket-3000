@@ -1,43 +1,43 @@
 "use client";
-import ECommerce from "@/components/Dashboard/E-commerce";
-import { Metadata } from "next";
 import { getItem, updateItem } from "../lightspeed-operations";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { Item } from "../lightspeed-types";
 import { useEffect, useState } from "react";
+import Alert, { AlertProps } from "@/components/Alert/alert";
 
 export default function UpcRocket() {
   const [item, setItem] = useState<Item | null>(null);
   const [skuField, setSkuField] = useState<string>("");
   const [upcField, setUpcField] = useState<string>("");
+  const [alertBox, setAlertBox] = useState<AlertProps>({
+    title: "",
+    content: "",
+    type: "warning",
+  });
 
   useEffect(() => {
-    focusOnSku();
+    focusOnInput("SKU");
   }, []);
 
-  function focusOnUpc() {
+  function focusOnInput(inputName: string) {
     setTimeout(() => {
       const input = document.querySelector(
-        "input[name=UPC]"
+        `input[name=${inputName}]`
       ) as HTMLInputElement;
       input.focus();
-    });
-  }
-
-  function focusOnSku() {
-    setTimeout(() => {
-      const input = document.querySelector(
-        "input[name=SKU]"
-      ) as HTMLInputElement;
-      input.focus();
-    });
+    }, 200);
   }
 
   function resetForm() {
     setSkuField("");
     setUpcField("");
     setItem(null);
-    focusOnSku();
+    setAlertBox({
+      title: "",
+      content: "",
+      type: "warning",
+    });
+    focusOnInput("SKU");
   }
 
   async function onSubmit(formData: FormData) {
@@ -49,15 +49,26 @@ export default function UpcRocket() {
       }
       const { item, error } = await getItem({ customSku: sku });
       if (error) {
-        window.alert(`Api error: ${error}`);
+        setAlertBox({
+          title: "Error",
+          content: `Api error: ${error}`,
+          type: "error",
+        });
+        return;
       }
       setItem(item);
-      focusOnUpc();
+      focusOnInput("UPC");
     } else {
       const upc = formData.get("UPC") as string;
       const upcRegex = /^[0-9]{12}$/;
       if (!upcRegex.test(upc)) {
-        window.alert("Invalid UPC format. Please enter a valid UPC.");
+        setAlertBox({
+          title: "UPC Invalid Format",
+          content: `Invalid UPC format. Please enter a valid UPC.`,
+          type: "warning",
+        });
+        setUpcField("");
+        focusOnInput("UPC");
         return;
       }
 
@@ -68,12 +79,16 @@ export default function UpcRocket() {
 
       const { error } = await updateItem(itemPayload);
       if (error) {
-        window.alert(`Api error: ${error}`);
+        setAlertBox({
+          title: "Error",
+          content: `Api error: ${error}`,
+          type: "error",
+        });
         return;
       }
       setItem(null);
       resetForm();
-      focusOnSku();
+      focusOnInput("SKU");
     }
   }
 
@@ -87,6 +102,13 @@ export default function UpcRocket() {
             <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
               <div className="flex flex-col gap-5.5 p-6.5">
                 <div>
+                  {alertBox && (
+                    <Alert
+                      title={alertBox.title}
+                      content={alertBox.content}
+                      type={alertBox.type}
+                    />
+                  )}
                   <label className="mb-3 block text-black dark:text-white">
                     SKU
                   </label>
@@ -95,8 +117,7 @@ export default function UpcRocket() {
                     name="SKU"
                     value={skuField}
                     onChange={(e) => setSkuField(e.target.value)}
-                    disabled={item !== null}
-                    //autoFocus={item === null}
+                    autoComplete="off"
                     className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                   />
                 </div>
@@ -113,15 +134,23 @@ export default function UpcRocket() {
                     name="UPC"
                     value={upcField}
                     onChange={(e) => setUpcField(e.target.value)}
+                    autoComplete="off"
                     className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                   />
+                  {item?.upc && (
+                    <Alert
+                      title="Alert"
+                      content={`UPC code already exists for this item : ${item?.upc}`}
+                      type="warning"
+                    />
+                  )}
                 </div>
 
                 <button
                   type="submit"
                   className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray"
                 >
-                  {{ item } ? "Search" : "Update Item"}
+                  {item === null ? "Search" : "Update Item"}
                 </button>
                 <button
                   type="button"

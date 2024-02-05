@@ -1,5 +1,6 @@
 import { DefaultSession, NextAuthOptions, Session } from "next-auth";
 import { JWT } from "next-auth/jwt";
+import { signOut } from "next-auth/react";
 
 // nextauth.d.ts
 declare module "next-auth" {
@@ -17,7 +18,6 @@ declare module "next-auth" {
 }
 
 export const authOptions: NextAuthOptions = {
-  // Configure one or more authentication providers
   providers: [
     {
       id: "lightspeed",
@@ -29,14 +29,13 @@ export const authOptions: NextAuthOptions = {
         url: "https://cloud.lightspeedapp.com/oauth/authorize.php",
         params: {
           response_type: "code",
-          scope: "employee:all",
+          scope: "employee:inventory",
           client_id: process.env.LIGHTSPEED_CLIENT_ID as string,
         },
       },
       idToken: false,
       checks: ["pkce", "state"],
       profile(profile: any, tokens: any) {
-        console.log("profile", profile);
         return {
           id: profile.employeeID as string,
           systemUserID: profile.systemUserID as string,
@@ -74,7 +73,6 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async jwt({ token, user, account, profile }) {
-      console.log("jwt");
       if (account && user) {
         // user is the profile returned from the profile callback
         return {
@@ -88,11 +86,6 @@ export const authOptions: NextAuthOptions = {
 
       // Return previous token if the access token has not expired yet
       if (Date.now() < ((token.accessTokenExpires as number) ?? 0)) {
-        console.log(
-          `No need to refresh token, ${
-            (token.accessTokenExpires as number) - Date.now()
-          } miliseconds left`
-        );
         return token;
       }
 
@@ -104,9 +97,7 @@ export const authOptions: NextAuthOptions = {
 
 async function refreshAccessToken(token: any) {
   try {
-    console.log("Refreshing access token");
     const url = "https://cloud.lightspeedapp.com/oauth/access_token.php";
-
     const response = await fetch(url, {
       headers: {
         "Content-Type": "application/json",
@@ -126,8 +117,6 @@ async function refreshAccessToken(token: any) {
       throw refreshedTokens;
     }
 
-    console.log("refreshedTokens", refreshedTokens);
-
     return {
       ...token,
       accessToken: refreshedTokens.access_token,
@@ -136,8 +125,10 @@ async function refreshAccessToken(token: any) {
       refreshToken: token.refreshToken,
     };
   } catch (error) {
-    console.log(error);
-
+    console.error("RefreshAccessTokenError", error);
+    signOut({
+      callbackUrl: "/",
+    });
     return {
       ...token,
       error: "RefreshAccessTokenError",
