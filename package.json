@@ -21,7 +21,7 @@
     "eslint-config-next": "13.4.12",
     "jsvectormap": "^1.5.3",
     "next": "^14.1.0",
-    "next-auth": "^4.24.5",
+    "next-auth": "^4.24.6",
     "postcss": "8.4.35",
     "react": "^18",
     "react-apexcharts": "^1.4.1",
